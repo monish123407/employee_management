@@ -1,8 +1,29 @@
 from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import *
+from .models import Employee
+from .serializers import EmployeeSerializer
+from rest_framework import generics, permissions
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+#authentications
+
+from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+# Create your views here.
+from rest_framework import generics,permissions
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+from rest_framework.decorators import api_view, permission_classes
 from .models import Employee
 from .serializers import EmployeeSerializer
 from rest_framework.decorators import api_view
@@ -16,11 +37,19 @@ class EmployeeRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    username = request.data['username']
+    password = request.data['password']
+    user = User.objects.create_user(username=username, password=password)
+    return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 @api_view(['GET'])
 def fetchAllEmployee(request):
+    p=[permissions.IsAuthenticated]
     querySet=Employee.objects.all()
     serializer=EmployeeSerializer(querySet,many=True)
-   
+    
     return Response(serializer.data)
 
 @api_view(['POST'])
