@@ -44,6 +44,7 @@ def register(request):
     password = request.data['password']
     user = User.objects.create_user(username=username, password=password)
     return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+
 @api_view(['GET'])
 def fetchAllEmployee(request):
     p=[permissions.IsAuthenticated]
